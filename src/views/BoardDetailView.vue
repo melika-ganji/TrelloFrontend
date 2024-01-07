@@ -33,9 +33,10 @@
                                         <li v-for="card in list.cards" :key="card.id">
                                             <div>
                                                 <span id="title">Task: {{ card.title }} </span>
-                                                <img v-if="card.is_finished"   src="@/assets/5957003_accept_check_mark_ok_tick_icon.png"  alt="check Icon">
-                                                <br>
-                                                <span v-if="checkDeadLine(card.deadline)">The deadline is over</span>
+                                                <img v-if="card.is_finished"   src="@/assets/5957003_accept_check_mark_ok_tick_icon.png"  alt="checkIcon">
+                                                <img v-if="!card.is_finished && checkDeadLine" src="@/assets/icons8-no-50.png" alt="checkIcon">
+                                                <br><br>
+                                                <span v-if="checkDeadLine(card.deadline)" id="deadline">The deadline is over</span>
                                             </div><br>
                                             <span id="user">Assigned to: {{ card.users.first_name }} {{ card.users.last_name }}</span><br><br>
                                             <span id="span1">Deadline:</span><br>
@@ -107,18 +108,19 @@
                 this.$router.push('/new/card')
             },
             checkDeadLine(deadLine){
-                const currentDate = new Date();
-                const formattedDateTime = currentDate.toLocaleString(); 
-                const currentDateTime = formattedDateTime;
-                if(currentDateTime == deadLine){
-                    return True
+                const now = new Date();
+                const deadline = new Date(deadLine);
+
+                if (now > deadline) {
+                    return true;
                 }
+            }
 
             }
 
         }
             
-    }
+    
 </script>
 
 <style>
@@ -140,6 +142,7 @@
         order: -1;
         margin-right: 10px;
         margin-bottom: 50px;
+        
     }
 
     .detail > div > .new{
@@ -263,6 +266,14 @@
         font-weight: bold;
         margin-right: 20px;
     }
+
+    .detail > ul > div > li > .list > div > li > .card > div > li > div > #deadline {
+        font-size: 20px;
+        font-weight: bold;
+        margin-right: 20px;
+        color: #ad1010;
+    }
+
 
     .detail > ul > div > li > .list > div > li > .card > div > li > div > img {
         width: 30px;
