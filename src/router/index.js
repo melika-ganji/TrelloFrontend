@@ -10,7 +10,9 @@ import NewBoardView from '../views/NewBoardView.vue'
 import BoardDetailView from '../views/BoardDetailView.vue'
 import NewListView from '../views/NewListView.vue'
 import NewCardView from '../views/NewCardView.vue'
-
+import CommentListView from '@/components/CommentList.vue'
+import CommentsView from '@/components/Comments.vue'
+import ParentCommentView from '@/components/ParentComment.vue'
 
 const routes = [
   {
@@ -67,6 +69,21 @@ const routes = [
     path: '/new/card',
     name: 'newcard',
     component: NewCardView
+  },
+  {
+    path: '/comments',
+    name: 'comments',
+    component:CommentsView
+  },
+  {
+    path: '/commentlist',
+    name: 'commentlist',
+    component:CommentListView
+  },
+  {
+    path: '/parentcomment',
+    name: 'parentcomment',
+    component:ParentCommentView
   }
 
 

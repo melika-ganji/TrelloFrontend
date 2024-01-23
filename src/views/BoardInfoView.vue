@@ -56,7 +56,7 @@
                 axios.get('trello/board/')
                      .then( response => {
                         console.log(response.data)
-                        this.boards = response.data.results
+                        this.boards = response.data
                         
                     })
                     .catch(error => {

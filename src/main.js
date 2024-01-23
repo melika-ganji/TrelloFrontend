@@ -12,6 +12,6 @@ const refresh = localStorage.getItem('refresh');
 store.commit('setAccess', access);
 store.commit('setRefresh', refresh);
 
+const app = createApp(App)
 
-
-createApp(App).use(store).use(router, axios).mount('#app')
+app.use(store).use(router, axios).mount('#app')

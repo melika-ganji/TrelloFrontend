@@ -6,6 +6,8 @@
             <button @click="newList" class="new">New List</button>
             <button @click="newCard" class="new">New Card</button>
         </div>
+
+
         <ul>
             <div v-if="details">
                 <li v-for="detail in details"  :key="detail.id">
@@ -28,10 +30,12 @@
                                 <span id="title">Subject: {{ list.title }} </span>    
                                 
                                 <ul v-if="list.cards.length > 0" class="card">
-                                    <div >
+                                    <div>
                                         <p>Cards:</p><br>
                                         <li v-for="card in list.cards" :key="card.id">
                                             <div>
+                                                <button v-if="show[card.id]" @click="toggleComments(card.id)">close</button>
+                                                <button v-if="!show[card.id]" @click="toggleComments(card.id)">Comments</button><br>
                                                 <span id="title">Task: {{ card.title }} </span>
                                                 <img v-if="card.is_finished"   src="@/assets/5957003_accept_check_mark_ok_tick_icon.png"  alt="checkIcon">
                                                 <img v-if="!card.is_finished && checkDeadLine" src="@/assets/icons8-no-50.png" alt="checkIcon">
@@ -41,7 +45,9 @@
                                             <span id="user">Assigned to: {{ card.users.first_name }} {{ card.users.last_name }}</span><br><br>
                                             <span id="span1">Deadline:</span><br>
                                             <span id="span2"> {{ card.deadline }} </span>
-                                                  
+                                            <parent-comment v-if="show[card.id]" :cardId="card.id" @create-signal-to-board="handleCommentCreated"/>
+                                                
+                                             
                                         </li>
                                     </div>
                                 </ul>
@@ -58,11 +64,17 @@
 
 <script>
     import axios from "axios"
+    import ParentComment from '@/components/ParentComment.vue';
+
     export default{
         name: 'BoardDetailView',
+        components: {
+            ParentComment,
+        },
         data(){
             return{
                 details: [],
+                show: {},
             }
         },
         created(){
@@ -87,7 +99,7 @@
                 axios.get('trello/board/detail/')
                      .then( response => {
                         console.log(response.data)
-                        this.details = response.data.results
+                        this.details = response.data
                         
                     })
                     .catch(error => {
@@ -107,6 +119,10 @@
             newCard(){
                 this.$router.push('/new/card')
             },
+            handleCommentCreated(){
+                console.log("work!");
+                window.location.reload();
+            },
             checkDeadLine(deadLine){
                 const now = new Date();
                 const deadline = new Date(deadLine);
@@ -114,8 +130,12 @@
                 if (now > deadline) {
                     return true;
                 }
-            }
+            },
+            toggleComments(cardId) {
+                this.show[cardId] = !this.show[cardId]
 
+
+            },
             }
 
         }
@@ -173,7 +193,7 @@
         border: 5px solid #333333;
         margin-top: 10px;
         margin-right: 30px;
-        width: 730px;
+        width: 800px;
         height: max-content;
         background-color: #7c9191;
         
@@ -220,9 +240,10 @@
 
 
     .detail > ul > div > li > .list > div > li{
-        width: 660px;
+        width: max-width;
         height: max-content;
         margin-bottom: 10px;
+        margin-right: 10px;
         padding-left: 5px;
         padding-top: 5px;
         border: 3px solid #333333;
@@ -253,18 +274,31 @@
     }
 
     .detail > ul > div > li > .list > div > li > .card > div > li{
-        width: 250px;
+        width: max-width;
         height: max-content;
         margin-bottom: 10px;
         padding-left: 5px;
         padding-top: 5px;
         border: 3px solid #333333;
+        margin-right: 10px;
     }
 
     .detail > ul > div > li > .list > div > li > .card > div > li > div > span {
         font-size: 20px;
         font-weight: bold;
         margin-right: 20px;
+    }
+
+    .detail > ul > div > li > .list > div > li > .card > div > li > div > button{
+        width: 100px;
+        height: 40px;
+        border-radius: 10px;
+        background-color: #c5d5d5;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        order: -1;
+        margin-right: 10px;
     }
 
     .detail > ul > div > li > .list > div > li > .card > div > li > div > #deadline {
