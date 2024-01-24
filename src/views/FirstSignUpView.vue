@@ -49,7 +49,7 @@
           }
 
 
-          axios.post('/api/token/users/', form)
+          axios.post('/trello/user/create/', form)
                 .then(response1 => {
                         console.log(response1)
                         axios.post('/api/token/jwt/create/', form)
@@ -124,7 +124,7 @@
       width: 100px;
       height: 40px;
       border-radius: 20px;
-      background-color: #baacba;
+      background-color: #acbaba;
       font-weight: bold;
       font-size: 15px;
       cursor: pointer;

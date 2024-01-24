@@ -69,6 +69,11 @@
             }
             
         },
+        mounted(){
+            setInterval(() => {
+               this.getAccess()
+            },5000)
+        },
         methods:{
             async makeCard(){
                     await this.fetchListId(this.listName)
@@ -120,6 +125,23 @@
             },
             goPreviousPage(){
                 this.$router.push('/board/detail')
+            },
+            getAccess(e){
+                const accessdata = {
+                    refresh: this.$store.state.refresh
+                }
+
+                axios 
+                    .post('/api/token/jwt/refresh/', accessdata)
+                    .then(response => {
+                            const access = response.data.access
+
+                            localStorage.setItem("access", access)
+                            this.$store.commit("setAccess", access)
+                    })
+                    .catch(error => {
+                            console.log(error)
+                    })
             }
 
         }

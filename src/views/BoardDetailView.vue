@@ -33,6 +33,7 @@
                                     <div>
                                         <p>Cards:</p><br>
                                         <li v-for="card in list.cards" :key="card.id">
+                                            
                                             <div>
                                                 <button v-if="show[card.id]" @click="toggleComments(card.id)">close</button>
                                                 <button v-if="!show[card.id]" @click="toggleComments(card.id)">Comments</button><br>
@@ -40,7 +41,12 @@
                                                 <img v-if="card.is_finished"   src="@/assets/5957003_accept_check_mark_ok_tick_icon.png"  alt="checkIcon">
                                                 <img v-if="!card.is_finished && checkDeadLine" src="@/assets/icons8-no-50.png" alt="checkIcon">
                                                 <br><br>
-                                                <span v-if="checkDeadLine(card.deadline)" id="deadline">The deadline is over</span>
+                                                <div>
+                                                    <p v-if="checkDeadLine(card.deadline)" id="deadline">The deadline is over.</p>
+                                                    <p v-else>
+                                                            <button v-if="!card.is_finished" @click="toggleFinish(card.id)">Finish</button>
+                                                    </p>
+                                                </div>
                                             </div><br>
                                             <span id="user">Assigned to: {{ card.users.first_name }} {{ card.users.last_name }}</span><br><br>
                                             <span id="span1">Deadline:</span><br>
@@ -75,6 +81,7 @@
             return{
                 details: [],
                 show: {},
+                username: '',
             }
         },
         created(){
@@ -92,6 +99,9 @@
         },
         mounted(){
             this.getDetailBoard()
+            setInterval(() => {
+                this.getAccess()
+            },5000)
         },
         methods:{
             getDetailBoard(e){
@@ -120,25 +130,61 @@
                 this.$router.push('/new/card')
             },
             handleCommentCreated(){
-                console.log("work!");
                 window.location.reload();
             },
             checkDeadLine(deadLine){
-                const now = new Date();
-                const deadline = new Date(deadLine);
 
-                if (now > deadline) {
-                    return true;
-                }
+                const deadlineDate = new Date(deadLine);
+
+                const currentDate = new Date();
+
+                return deadlineDate < currentDate;
             },
             toggleComments(cardId) {
                 this.show[cardId] = !this.show[cardId]
 
 
             },
+            async toggleFinish(id){
+
+                await this.fetchUserId()
+
+                await axios.get(`/trello/finish/${id}/card/${this.username}/`)
+                     .then(response => {
+                        window.location.reload();
+                     })
+            },
+            async fetchUserId(){
+                await axios.get('/api/token/users/me/')
+                     .then(response => {
+                        this.username = response.data.username
+                        
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            },
+            getAccess(e){
+                const accessdata = {
+                    refresh: this.$store.state.refresh
+                }
+
+                axios 
+                    .post('/api/token/jwt/refresh/', accessdata)
+                    .then(response => {
+                            const access = response.data.access
+
+                            localStorage.setItem("access", access)
+                            this.$store.commit("setAccess", access)
+                    })
+                    .catch(error => {
+                            console.log(error)
+                    })
             }
 
         }
+
+    }
             
     
 </script>
@@ -283,6 +329,18 @@
         margin-right: 10px;
     }
 
+    .detail > ul > div > li > .list > div > li > .card > div > li > button{
+        width: 100px;
+        height: 40px;
+        border-radius: 10px;
+        background-color: #c5d5d5;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        order: -1;
+        margin-right: 10px;
+    }
+
     .detail > ul > div > li > .list > div > li > .card > div > li > div > span {
         font-size: 20px;
         font-weight: bold;
@@ -301,13 +359,25 @@
         margin-right: 10px;
     }
 
-    .detail > ul > div > li > .list > div > li > .card > div > li > div > #deadline {
+    #deadline {
         font-size: 20px;
         font-weight: bold;
         margin-right: 20px;
         color: #ad1010;
     }
 
+    .detail > ul > div > li > .list > div > li > .card > div > li > div > div > p > button{
+        width: 100px;
+        height: 40px;
+        border-radius: 10px;
+        background-color: #333333;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        order: -1;
+        margin-right: 10px;
+        color: #acbaba;
+    }
 
     .detail > ul > div > li > .list > div > li > .card > div > li > div > img {
         width: 30px;

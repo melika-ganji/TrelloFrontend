@@ -37,6 +37,8 @@
                 title: '',
                 boardId: '',
                 boardName: '',
+                userId: '',
+                username: '',
             }
         },
         created(){
@@ -52,15 +54,24 @@
             }
             
         },
+        mounted(){
+            setInterval(() => {
+            this.getAccess()
+            },5000)
+        },
         methods:{
             async makeList(){
+                    await this.fetchUserId()
+
                     await this.fetchBoardId(this.boardName)
 
-                    await this.createBoard()
+                    await this.createList()
+
+                    
 
             },
             async fetchBoardId(name){
-                await axios.get(`/trello/get/board/${name}/`)
+                await axios.get(`/trello/get/board/${name}/${this.username}/`)
                            .then(response =>{
                                 console.log(response.data)
                                 this.boardId = response.data.id
@@ -68,7 +79,7 @@
 
                            }) 
             },
-            async createBoard(){
+            async createList(){
                 const form = {
                      title: this.title,
                      board: this.boardId
@@ -86,8 +97,35 @@
                     })
 
             },
+            async fetchUserId(){
+                await axios.get('/api/token/users/me/')
+                     .then(response => {
+                        this.username = response.data.username
+                        
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            },
             goPreviousPage(){
                 this.$router.push('/board/detail')
+            },
+            getAccess(e){
+                const accessdata = {
+                    refresh: this.$store.state.refresh
+                }
+
+                axios 
+                    .post('/api/token/jwt/refresh/', accessdata)
+                    .then(response => {
+                            const access = response.data.access
+
+                            localStorage.setItem("access", access)
+                            this.$store.commit("setAccess", access)
+                    })
+                    .catch(error => {
+                            console.log(error)
+                    })
             }
 
         }

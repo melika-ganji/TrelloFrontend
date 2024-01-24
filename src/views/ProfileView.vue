@@ -81,6 +81,9 @@ import axios from "axios"
         },
         mounted(){
             this.getInfo()
+            setInterval(() => {
+                this.getAccess()
+            },5000)
         },
         methods: {
             getInfo(e){
@@ -108,6 +111,23 @@ import axios from "axios"
             },
             goPreviousPage(){
                 this.$router.push('/board/info')
+            },
+            getAccess(e){
+                const accessdata = {
+                    refresh: this.$store.state.refresh
+                }
+
+                axios 
+                    .post('/api/token/jwt/refresh/', accessdata)
+                    .then(response => {
+                            const access = response.data.access
+
+                            localStorage.setItem("access", access)
+                            this.$store.commit("setAccess", access)
+                    })
+                    .catch(error => {
+                            console.log(error)
+                    })
             }
         }
 

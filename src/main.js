@@ -4,7 +4,7 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 
-axios.defaults.baseURL = "http://0.0.0.0:8000"
+axios.defaults.baseURL = "http://0.0.0.0:8010"
 
 const access= localStorage.getItem('access');
 const refresh = localStorage.getItem('refresh');
