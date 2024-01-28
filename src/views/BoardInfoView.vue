@@ -147,7 +147,7 @@
         border: 5px solid #333333;
         margin-top: 10px;
         margin-right: 30px;
-        width: 250px;
+        width: max-content;
         height: 300px;
         background-color: #7c9191;
         
